@@ -39,6 +39,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         setLoading(false);
       }
+    }).catch(err => {
+      console.error("Failed to get session:", err);
+      setLoading(false);
     });
 
     // Listen for changes
