@@ -40,7 +40,12 @@ const Login: React.FC = () => {
          }
       }
     } catch (err: any) {
-      setError(err.message);
+      console.error("Login failed:", err);
+      if (err.message === 'Failed to fetch') {
+        setError('连接服务器失败。请检查您的网络连接，或确认系统维护状态。提示：如果这是首次部署，请检查 GitHub Secrets 配置是否正确。');
+      } else {
+        setError(err.message || '登录发生错误');
+      }
     } finally {
       setLoading(false);
     }
