@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 import type { Profile, Application } from '../types';
 import * as XLSX from 'xlsx';
-import { LogOut, Download, Mail, Edit, Check, X } from 'lucide-react';
+import { LogOut, Download, Mail, Edit, Check, X, Menu } from 'lucide-react';
 
 const MemberList: React.FC = () => {
   const [members, setMembers] = useState<Profile[]>([]);
@@ -163,7 +163,7 @@ const MemberList: React.FC = () => {
                           </div>
                         ) : (
                           <>
-                             <div className="text-sm text-gray-900">{getLevelName(member.membership_level)}</div>
+                             <div className="text-sm text-gray-900">{getLevelName(member.membership_level || '')}</div>
                              <div className="text-xs text-gray-500 capitalize">{member.role === 'admin' ? '管理员' : '会员'}</div>
                           </>
                         )}
@@ -172,7 +172,7 @@ const MemberList: React.FC = () => {
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           member.membership_status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                         }`}>
-                          {getStatusName(member.membership_status)}
+                          {getStatusName(member.membership_status || '')}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
