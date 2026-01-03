@@ -130,7 +130,22 @@ const Login: React.FC = () => {
             </Link>
           </div>
 
-
+          <div className="mt-4 p-2 bg-gray-100 rounded text-xs text-gray-500 break-all">
+            <p><strong>Deployment Diagnostic:</strong></p>
+            <p>Supabase URL: {import.meta.env.VITE_SUPABASE_URL ? 
+              import.meta.env.VITE_SUPABASE_URL.substring(0, 15) + '...' : 
+              <span className="text-red-600 font-bold">MISSING / NOT LOADED</span>
+            }</p>
+            <p>Supabase Key: {import.meta.env.VITE_SUPABASE_ANON_KEY ? 
+              'Configured (Length: ' + import.meta.env.VITE_SUPABASE_ANON_KEY.length + ')' : 
+              <span className="text-red-600 font-bold">MISSING</span>
+            }</p>
+            <p>Current URL: {window.location.href}</p>
+            <p className="mt-1">
+              If URL is "MISSING", check GitHub Secrets. <br/>
+              If URL is "https://place...", secrets are not injecting.
+            </p>
+          </div>
         </form>
       </div>
     </div>
