@@ -57,16 +57,3 @@ export interface EventParticipant {
   created_at: string;
   user?: Profile; // Joined
 }
-
-// 会员历年数据
-export interface MemberHistory {
-  id: string;
-  member_id: string;
-  year: number;
-  membership_level: string;
-  membership_status: string;
-  payment_status: string;
-  membership_duration_days: number;
-  created_at: string;
-  member?: Profile; // Joined
-}
