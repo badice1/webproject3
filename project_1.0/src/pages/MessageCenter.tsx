@@ -125,6 +125,42 @@ const MessageCenter: React.FC = () => {
 
       if (sendError) throw sendError;
 
+      // 3. Send email notification to recipient
+      try {
+        // 获取发件人信息
+        const { data: senderData } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user?.id)
+          .single();
+        
+        // 使用 Supabase 的边缘函数或邮件服务发送通知
+        // 这里使用简单的 HTTP 请求到 Supabase Edge Function
+        const emailContent = `
+你好！
+
+你收到了一条新消息：
+
+发件人：${senderData?.full_name || '系统'}
+主题：${subject}
+内容：${content}
+
+请登录会员系统查看详细信息。
+        `.trim();
+        
+        // 尝试发送邮件通知（使用 Supabase 边缘函数或其他邮件服务）
+        // 注意：这部分需要配置 Supabase 边缘函数或邮件服务
+        // 目前使用简单的日志记录，实际部署时需要替换为真实的邮件发送逻辑
+        console.log('发送邮件通知:', {
+          to: recipientEmail,
+          subject: `新消息通知：${subject}`,
+          content: emailContent
+        });
+      } catch (emailError) {
+        console.error('邮件发送失败:', emailError);
+        // 邮件发送失败不影响消息发送
+      }
+
       alert('消息发送成功');
       setRecipientEmail('');
       setSubject('');

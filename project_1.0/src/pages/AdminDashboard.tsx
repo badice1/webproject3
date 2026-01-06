@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Link, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
-import type { Profile, Application } from '../types';
+import type { Profile, Application, MemberHistory } from '../types';
 import * as XLSX from 'xlsx';
-import { LogOut, Download, Mail, Edit, Check, X, Menu } from 'lucide-react';
+import { LogOut, Download, Mail, Edit, Check, X, Menu, ClockHistory, ArrowLeft } from 'lucide-react';
 
 const MemberList: React.FC = () => {
   const [members, setMembers] = useState<Profile[]>([]);
@@ -204,6 +204,9 @@ const MemberList: React.FC = () => {
                           <div className="flex gap-4 justify-end">
                             <button onClick={() => startEdit(member)} className="text-indigo-600 hover:text-indigo-900"><Edit className="h-5 w-5"/></button>
                             <button onClick={() => sendEmail(member.email)} className="text-gray-600 hover:text-gray-900"><Mail className="h-5 w-5"/></button>
+                            <Link to={`/admin/members/${member.id}/history`} className="text-blue-600 hover:text-blue-900">
+                              <ClockHistory className="h-5 w-5"/>
+                            </Link>
                           </div>
                         )}
                       </td>
@@ -215,6 +218,109 @@ const MemberList: React.FC = () => {
           </div>
         </div>
       </div>
+    </div>
+  );
+};
+
+// 会员历史记录组件
+const MemberHistoryPage: React.FC = () => {
+  const { memberId } = useParams<{ memberId: string }>();
+  const [history, setHistory] = useState<MemberHistory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [member, setMember] = useState<Profile | null>(null);
+
+  useEffect(() => {
+    fetchMemberHistory();
+  }, [memberId]);
+
+  const fetchMemberHistory = async () => {
+    if (!memberId) return;
+    
+    setLoading(true);
+    try {
+      // 获取会员基本信息
+      const { data: memberData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', memberId)
+        .single();
+      
+      if (memberData) {
+        setMember(memberData);
+      }
+      
+      // 获取会员历史记录
+      const { data, error } = await supabase
+        .from('member_history')
+        .select('*')
+        .eq('member_id', memberId)
+        .order('year', { ascending: false });
+      
+      if (error) console.error(error);
+      else setHistory(data || []);
+    } catch (err) {
+      console.error('Failed to fetch member history:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="bg-white shadow sm:rounded-lg">
+      <div className="px-4 py-5 sm:px-6 flex items-center justify-between">
+        <div className="flex items-center">
+          <Link to="/admin" className="mr-4 text-indigo-600 hover:text-indigo-900">
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
+          <div>
+            <h3 className="text-lg leading-6 font-medium text-gray-900">会员历年数据</h3>
+            {member && (
+              <p className="mt-1 text-sm text-gray-500">{member.full_name} ({member.email})</p>
+            )}
+          </div>
+        </div>
+      </div>
+      
+      {loading ? (
+        <div className="px-6 py-10 text-center text-gray-500">加载中...</div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">年份</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">会员等级</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">会员状态</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">缴费状态</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">剩余时长（天）</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">记录日期</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {history.length > 0 ? (
+                history.map((record) => (
+                  <tr key={record.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.year}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{record.membership_level}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${record.membership_status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                        {record.membership_status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{record.payment_status}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{record.membership_duration_days}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(record.created_at).toLocaleDateString()}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="px-6 py-10 text-center text-gray-500">暂无历史记录</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
@@ -325,9 +431,7 @@ const ApplicationList: React.FC = () => {
                     </button>
                   </>
                 ) : (
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    app.status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${app.status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                     {app.status === 'approved' ? '已批准' : '已拒绝'}
                   </span>
                 )}
@@ -467,6 +571,7 @@ const AdminDashboard: React.FC = () => {
             <Routes>
                <Route index element={<MemberList />} />
                <Route path="applications" element={<ApplicationList />} />
+               <Route path="members/:memberId/history" element={<MemberHistoryPage />} />
             </Routes>
           </div>
         </main>
