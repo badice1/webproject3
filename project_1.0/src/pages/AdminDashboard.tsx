@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
-import type { Profile, Application, AppMessage } from '../types';
+import type { Profile, Application } from '../types';
 import * as XLSX from 'xlsx';
-import { LogOut, Download, Mail, Edit, Check, X, Menu, Send } from 'lucide-react';
+import { LogOut, Download, Mail, Edit, Check, X, Menu } from 'lucide-react';
 import MessageCenter from './MessageCenter';
 
 const MemberList: React.FC = () => {
