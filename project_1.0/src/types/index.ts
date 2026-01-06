@@ -5,6 +5,7 @@ export interface Profile {
   role: 'member' | 'admin';
   membership_level?: string;
   membership_status?: 'active' | 'inactive' | 'pending';
+  membership_duration_days?: number; // 会员剩余时长（天）
   payment_status?: string;
   join_date?: string;
   phone?: string;

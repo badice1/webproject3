@@ -1,0 +1,46 @@
+前端采用 React 18+TypeScript+Vite 构建，基于组件化思想拆分页面与功能模块，核心工程结构如下：
+plaintext
+├── public/              # 静态资源目录（图片、字体等）
+│   ├── .nojekyll        # GitHub Pages配置文件，防止被识别为Jekyll站点
+│   └── vite.svg         # Vite默认图标
+├── src/                 # 源代码目录（核心代码）
+│   ├── assets/          # 资源文件（图片、图标等）
+│   │   └── react.svg    # React官方图标
+│   ├── components/      # 通用组件（路由保护等可复用组件）
+│   │   └── ProtectedRoute.tsx  # 路由保护组件，控制访问权限
+│   ├── context/         # 上下文管理（全局状态、认证信息）
+│   │   └── AuthContext.tsx      # 认证上下文，管理用户状态
+│   ├── lib/             # 工具库（Supabase配置、工具函数）
+│   │   └── supabase.ts          # Supabase客户端配置
+│   ├── pages/           # 页面组件（所有功能页面）
+│   │   ├── AdminDashboard.tsx   # 管理员仪表盘
+│   │   ├── EventBoard.tsx       # 事件公告板
+│   │   ├── ForgotPassword.tsx   # 忘记密码页面
+│   │   ├── Login.tsx             # 登录页面
+│   │   ├── MemberDashboard.tsx  # 会员仪表盘
+│   │   ├── MessageCenter.tsx     # 消息中心
+│   │   ├── Register.tsx          # 注册页面
+│   │   └── ResetPassword.tsx     # 重置密码页面
+│   ├── types/           # 类型定义（TypeScript接口、枚举）
+│   │   └── index.ts              # 类型定义文件
+│   ├── App.css          # 应用级样式
+│   ├── App.tsx          # 应用入口（路由配置）
+│   ├── index.css        # 全局样式（Tailwind基础样式）
+│   └── main.tsx         # 主入口（渲染根组件）
+├── .env                 # 开发环境变量配置
+├── .env.production      # 生产环境变量配置
+├── .gitignore           # Git忽略文件配置
+├── README.md            # 项目说明文档
+├── db_new_features.sql  # 数据库新功能脚本
+├── db_schema.sql        # 数据库表结构定义脚本
+├── db_triggers.sql      # 数据库触发器定义脚本
+├── eslint.config.js     # ESLint代码质量检查配置
+├── index.html           # HTML模板文件
+├── package-lock.json    # 依赖版本锁定文件
+├── package.json         # 项目配置和依赖管理
+├── postcss.config.js    # PostCSS配置（CSS处理）
+├── tailwind.config.js   # Tailwind CSS配置
+├── tsconfig.app.json    # TypeScript应用配置
+├── tsconfig.json        # TypeScript基础配置
+├── tsconfig.node.json   # TypeScript Node配置
+└── vite.config.ts       # Vite构建工具配置

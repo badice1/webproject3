@@ -34,6 +34,7 @@ const MemberList: React.FC = () => {
       "角色": m.role === 'admin' ? '管理员' : '会员',
       "会员等级": m.membership_level,
       "状态": m.membership_status,
+      "剩余时长": m.membership_duration_days,
       "电话": m.phone,
       "单位": m.institution,
       "加入时间": m.join_date
@@ -47,7 +48,11 @@ const MemberList: React.FC = () => {
 
   const startEdit = (member: Profile) => {
     setEditingId(member.id);
-    setEditForm({ membership_level: member.membership_level, role: member.role });
+    setEditForm({ 
+      membership_level: member.membership_level, 
+      role: member.role,
+      membership_duration_days: member.membership_duration_days || 0
+    });
   };
 
   const saveEdit = async (id: string) => {
@@ -119,6 +124,7 @@ const MemberList: React.FC = () => {
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">单位 / 电话</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">等级 / 角色</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">剩余时长</th>
                     <th scope="col" className="relative px-6 py-3"><span className="sr-only">操作</span></th>
                   </tr>
                 </thead>
@@ -169,11 +175,24 @@ const MemberList: React.FC = () => {
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          member.membership_status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                        }`}>
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${member.membership_status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                           {getStatusName(member.membership_status || '')}
                         </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {editingId === member.id ? (
+                          <input
+                            type="number"
+                            min="0"
+                            className="text-sm border rounded px-2 py-1"
+                            value={editForm.membership_duration_days}
+                            onChange={e => setEditForm({...editForm, membership_duration_days: parseInt(e.target.value) || 0})}
+                          />
+                        ) : (
+                          <div className="text-sm text-gray-900">
+                            {member.membership_duration_days || 0} 天
+                          </div>
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         {editingId === member.id ? (

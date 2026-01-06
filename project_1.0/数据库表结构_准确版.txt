@@ -1,0 +1,40 @@
+表名	字段名	数据类型	约束	描述
+profiles	id	uuid	主键，外键引用 auth.users	用户唯一标识
+profiles	email	text	唯一，非空	用户邮箱（登录账号）
+profiles	full_name	text	-	用户姓名
+profiles	role	text	枚举 ('member', 'admin')，默认 'member'	用户角色（会员 / 管理员）
+profiles	membership_level	text	默认 'General'	会员级别（普通 / 理事长等）
+profiles	membership_status	text	默认 'pending'	会员状态（待审核 / 已通过等）
+profiles	payment_status	text	默认 'unpaid'	缴费状态（未缴费 / 已缴费）
+profiles	join_date	date	默认 current_date	加入学会日期
+profiles	phone	text	-	联系电话
+profiles	institution	text	-	所属机构
+profiles	created_at	timestamptz	默认 now ()	记录创建时间
+applications	id	uuid	主键，默认 gen_random_uuid ()	申请唯一标识
+applications	user_id	uuid	外键引用 profiles.id，非空	关联用户 ID
+applications	full_name	text	-	申请人姓名
+applications	content	jsonb	-	申请详细内容
+applications	status	text	默认 'pending'	申请状态（待审核 / 已通过 / 已拒绝）
+applications	created_at	timestamptz	默认 now ()	申请提交时间
+messages	id	uuid	主键，默认 gen_random_uuid ()	消息唯一标识
+messages	sender_id	uuid	外键引用 profiles.id，非空	发送者 ID
+messages	receiver_id	uuid	外键引用 profiles.id，非空	接收者 ID
+messages	subject	text	-	消息主题
+messages	content	text	-	消息内容
+messages	message_type	text	默认 'text'	消息类型（文本 / 活动申请等）
+messages	related_entity_id	uuid	-	关联实体 ID
+messages	is_read	boolean	默认 false	已读状态
+messages	created_at	timestamptz	默认 now ()	发送时间
+events	id	uuid	主键，默认 gen_random_uuid ()	活动唯一标识
+events	creator_id	uuid	外键引用 profiles.id，非空	创建者 ID
+events	title	text	非空	活动标题
+events	description	text	-	活动描述
+events	location	text	-	活动地点
+events	event_time	timestamptz	非空	活动时间
+events	max_participants	int	默认 0	最大参与人数
+events	created_at	timestamptz	默认 now ()	创建时间
+event_participants	id	uuid	主键，默认 gen_random_uuid ()	参与者记录唯一标识
+event_participants	event_id	uuid	外键引用 events.id，非空	关联活动 ID
+event_participants	user_id	uuid	外键引用 profiles.id，非空	参与者用户 ID
+event_participants	status	text	默认 'pending'	参与状态（待审核 / 已通过 / 已拒绝）
+event_participants	created_at	timestamptz	默认 now ()	记录创建时间
