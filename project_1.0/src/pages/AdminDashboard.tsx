@@ -237,13 +237,66 @@ const ApplicationList: React.FC = () => {
   };
 
   const updateStatus = async (id: string, status: 'approved' | 'rejected') => {
-    const { error } = await supabase
+    // 1. 获取申请详情，包括user_id
+    const { data: applicationData, error: fetchError } = await supabase
+      .from('applications')
+      .select('user_id')
+      .eq('id', id)
+      .single();
+    
+    if (fetchError) {
+      console.error('Failed to fetch application:', fetchError);
+      return;
+    }
+    
+    // 2. 更新申请状态
+    const { error: updateAppError } = await supabase
       .from('applications')
       .update({ status })
       .eq('id', id);
     
-    if (!error) {
-      setApplications(applications.map(a => a.id === id ? { ...a, status } : a));
+    if (updateAppError) {
+      console.error('Failed to update application status:', updateAppError);
+      return;
+    }
+    
+    // 3. 根据申请状态更新会员状态
+    if (applicationData.user_id) {
+      if (status === 'approved') {
+        // 批准申请：设置会员状态为active，并给予默认365天会员时长
+        const { error: updateMemberError } = await supabase
+          .from('profiles')
+          .update({ 
+            membership_status: 'active',
+            membership_duration_days: 365 // 默认给予1年会员时长
+          })
+          .eq('id', applicationData.user_id);
+        
+        if (updateMemberError) {
+          console.error('Failed to update member status:', updateMemberError);
+        }
+      } else if (status === 'rejected') {
+        // 拒绝申请：设置会员状态为rejected
+        const { error: updateMemberError } = await supabase
+          .from('profiles')
+          .update({ membership_status: 'rejected' })
+          .eq('id', applicationData.user_id);
+        
+        if (updateMemberError) {
+          console.error('Failed to update member status:', updateMemberError);
+        }
+      }
+    }
+    
+    // 4. 更新本地状态
+    setApplications(applications.map(a => a.id === id ? { ...a, status } : a));
+    
+    // 5. 通知父组件或重新加载会员列表
+    // 由于MemberList和ApplicationList是兄弟组件，需要通过刷新页面或其他方式更新
+    // 这里可以通过事件或状态提升来实现，暂时先刷新整个页面
+    if (status === 'approved') {
+      // 刷新当前页面，确保会员列表显示最新状态
+      window.location.reload();
     }
   };
 
