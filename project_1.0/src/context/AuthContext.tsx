@@ -102,7 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return;
 
     // 监听当前用户profile的变化
-    const { data: { subscription: profileSubscription } } = supabase
+    const profileChannel = supabase
       .channel(`profile:${user.id}`)
       .on('postgres_changes', {
         event: '*',
@@ -118,7 +118,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       .subscribe();
 
     return () => {
-      profileSubscription.unsubscribe();
+      profileChannel.unsubscribe();
     };
   }, [user]); // 当user变化时重新订阅
 
