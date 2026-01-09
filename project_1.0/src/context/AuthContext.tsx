@@ -76,7 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     // 2. 监听认证状态变化
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       // 更新会话和用户状态
       setSession(session);
       setUser(session?.user ?? null);
@@ -92,8 +92,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     // 3. 组件卸载时取消订阅
-    return () => subscription.unsubscribe();
+    return () => {
+      authSubscription.unsubscribe();
+    };
   }, []); // 空依赖数组，只在组件挂载时执行一次
+
+  // 监听profile数据变化
+  useEffect(() => {
+    if (!user) return;
+
+    // 监听当前用户profile的变化
+    const { data: { subscription: profileSubscription } } = supabase
+      .channel(`profile:${user.id}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'profiles',
+        filter: `id=eq.${user.id}`
+      }, (payload) => {
+        // 更新profile数据
+        if (payload.new) {
+          setProfile(payload.new as Profile);
+        }
+      })
+      .subscribe();
+
+    return () => {
+      profileSubscription.unsubscribe();
+    };
+  }, [user]); // 当user变化时重新订阅
 
   /**
    * 获取用户个人资料
