@@ -1,7 +1,0 @@
-三、软件实现与调试
-3.3.1 调试工具与方法
-前端调试：使用 Chrome 浏览器开发者工具（Elements、Console、Network）调试 DOM 结构、打印日志、监控接口请求；利用 Vite 开发服务器的热更新功能快速预览修改效果；通过 ESLint 实时检查代码规范，结合 TypeScript 类型检查确保代码质量；
-接口调试：通过 Postman 测试 Supabase 接口调用，验证数据传输正确性；利用 Supabase 控制台提供的 API 测试功能直接调试数据库操作；在代码中使用 console.log 打印 Supabase 调用结果，辅助调试数据交互；
-数据调试：利用 Supabase 控制台查看数据库表数据、触发器执行情况，验证数据存储与更新是否符合预期；通过执行 db_schema.sql、db_triggers.sql、db_new_features.sql 等脚本调试数据库结构变更；
-环境调试：通过 .env 与 .env.production 区分开发 / 生产环境，确保 Supabase URL、密钥等环境变量配置正确；在 src/lib/supabase.ts 中添加配置检查日志，辅助调试环境变量加载问题；
-异常处理：在代码中添加 try-catch 块捕获异步操作异常，特别是 Supabase 调用异常；打印详细错误日志，包括错误信息、调用参数等；前端添加错误提示组件，如登录页面的错误信息展示，提升用户体验；
