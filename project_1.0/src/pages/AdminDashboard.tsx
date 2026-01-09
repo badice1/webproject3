@@ -96,13 +96,16 @@ const MemberList: React.FC = () => {
         .update(editForm)
         .eq('id', id);
       
-      if (error) throw error;
+      if (error) {
+        console.error('更新会员失败:', error);
+        throw error;
+      }
       
       setMembers(members.map(m => m.id === id ? { ...m, ...editForm } : m));
       setEditingId(null);
-    } catch (err) {
-      console.error(err);
-      alert('更新会员失败');
+    } catch (err: any) {
+      console.error('更新会员失败详细信息:', err);
+      alert(`更新会员失败: ${err.message || '未知错误'}`);
     }
   };
 
