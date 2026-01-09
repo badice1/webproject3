@@ -55,10 +55,10 @@ const MemberProfile: React.FC = () => {
     }
   };
 
-  const getPaymentStatus = (status: string | undefined) => {
-      // Assuming 'paid', 'unpaid' or similar. 
-      // If it's just arbitrary string, we might need more logic.
-      // Let's assume default English values and translate them.
+  const getPaymentStatus = (status: string | undefined, durationDays: number | undefined) => {
+      // 如果有会员时长且大于0，自动显示为已缴费
+      if (durationDays && durationDays > 0) return '已缴费';
+      // 否则根据payment_status字段判断
       if (!status) return '未缴费';
       if (status.toLowerCase() === 'paid') return '已缴费';
       if (status.toLowerCase() === 'unpaid') return '未缴费';
@@ -97,7 +97,7 @@ const MemberProfile: React.FC = () => {
           </div>
           <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt className="text-sm font-medium text-gray-500">缴费状态</dt>
-            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{getPaymentStatus(profile.payment_status)}</dd>
+            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{getPaymentStatus(profile.payment_status, profile.membership_duration_days)}</dd>
           </div>
            <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt className="text-sm font-medium text-gray-500">单位 / 学校</dt>

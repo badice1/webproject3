@@ -399,32 +399,33 @@ const ApplicationList: React.FC = () => {
     }
     
     // 3. 根据申请状态更新会员状态
-    if (applicationData.user_id) {
-      if (status === 'approved') {
-        // 批准申请：设置会员状态为active，并给予默认365天会员时长
-        const { error: updateMemberError } = await supabase
-          .from('profiles')
-          .update({ 
-            membership_status: 'active',
-            membership_duration_days: 365 // 默认给予1年会员时长
-          })
-          .eq('id', applicationData.user_id);
-        
-        if (updateMemberError) {
-          console.error('Failed to update member status:', updateMemberError);
-        }
-      } else if (status === 'rejected') {
-        // 拒绝申请：设置会员状态为rejected
-        const { error: updateMemberError } = await supabase
-          .from('profiles')
-          .update({ membership_status: 'rejected' })
-          .eq('id', applicationData.user_id);
-        
-        if (updateMemberError) {
-          console.error('Failed to update member status:', updateMemberError);
+      if (applicationData.user_id) {
+        if (status === 'approved') {
+          // 批准申请：设置会员状态为active，给予默认365天会员时长，并标记为已缴费
+          const { error: updateMemberError } = await supabase
+            .from('profiles')
+            .update({ 
+              membership_status: 'active',
+              membership_duration_days: 365, // 默认给予1年会员时长
+              payment_status: 'paid' // 标记为已缴费
+            })
+            .eq('id', applicationData.user_id);
+          
+          if (updateMemberError) {
+            console.error('Failed to update member status:', updateMemberError);
+          }
+        } else if (status === 'rejected') {
+          // 拒绝申请：设置会员状态为rejected
+          const { error: updateMemberError } = await supabase
+            .from('profiles')
+            .update({ membership_status: 'rejected' })
+            .eq('id', applicationData.user_id);
+          
+          if (updateMemberError) {
+            console.error('Failed to update member status:', updateMemberError);
+          }
         }
       }
-    }
     
     // 4. 更新本地状态
     setApplications(applications.map(a => a.id === id ? { ...a, status } : a));
